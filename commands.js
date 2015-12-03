@@ -514,6 +514,7 @@ exports.commands = {
 		}
 		this.say(room, text);
 	},
+       
 
 	// Roleplaying commands
 	rpset: "setrp",
@@ -533,7 +534,7 @@ exports.commands = {
 	start: function(arg, by, room) {
 		if (config.voiceList.indexOf(toId(by)) == -1 && !this.canUse('setrp', room, by) || !(room in this.RP) || this.RP[room].setAt) return false;
 		if (!this.RP[room].plot) {
-			if (!arg) return this.say(room, 'Please set an RP before using .start, or specify an RP with .start to start one immediately.');
+			if (!arg) return this.say(room, 'Please set an RP before using -start, or specify an RP with -start to start one immediately.');
 			this.RP[room].plot = arg;
 		}
 
@@ -564,7 +565,7 @@ exports.commands = {
 				this.say(room, "__All participants within the RP may only have ONE chance to coup any kingdom. PM me/the host any alliances, name changes, leaving, Conquests and cheating.  Post battle links in the chat.  There will be a 10 minute grace period at the start of the RP, and types will be locked at 2 hours.__");
 				this.say(room, "**Warlords may trade one Pokemon with each of their allies, up to a maximum of two trades. The Pokemon must be part of your original party and cannot be a legend or mega. The two Pokemon must be agreed upon by both warlords and reported to the host.**");
 				this.say(room, "__Trades may be canceled, but you may never trade with that kingdom again. If your ally is defeated, the trade isn't reversed. You can't trade a banned Pokemon to that type (e.g Aegislash to Steel). Lastly, if a kingdom gets a new Warlord, the trades are only reset for THAT kingdom.__");
-				this.say(room, "***Finally, a reminder that, if you do not RP, you are liable to be ignored by the person you are challenging.**");
+				this.say(room, "**Finally, a reminder that, if you do not RP, you are liable to be ignored by the person you are challenging.**");
 
 		}
 		
@@ -723,9 +724,6 @@ exports.commands = {
 	endrp: function(arg, by, room) {
 		if (config.voiceList.indexOf(toId(by)) == -1 && !this.canUse('setrp', room, by) || !(room in this.RP) || !this.RP[room].plot) return false;
 		if (config.serverid === 'showdown' && this.RP[room].setAt) {
-			nextVoid = splitDoc(this.RP[room].plot);
-			if (this.RP.void[room].length === 2) this.RP.void[room].shift();
-			this.RP.void[room].push(nextVoid);
 
 			if (toId(this.RP[room].plot) === 'freeroam') {
 				clearTimeout(this.freeroamTimeouts[room]);
@@ -762,54 +760,7 @@ exports.commands = {
 		}
 		this.splitMessage('>' + room + '\n|c|~Morfent|' + config.commandcharacter + 'void');
 	},
-	void: function(arg, by, room) {
-		if (config.serverid !== 'showdown' || !(room in this.RP) || this.RP[room].plot) return false;
-		var text = '';
-		if (room === 'rustyrp'){
-			text += '**';
-			if (this.RP['roleplaying'].plot) {
-				text += "The RP in Roleplaying is " + splitDoc(this.RP['roleplaying'].plot) + ".";
-			}
-			if (this.RP['amphyrp'].plot) {
-				text += " The RP in AmphyRP is " + splitDoc(this.RP['amphyrp'].plot) + ".";
-			}
-			if (!this.RP['roleplaying'].plot && !this.RP['amphyrp'].plot) {
-				text += "No RPs are void.";
-			}
-			text += "**";
-			return this.say(room, text);
-		}
-
-		var voided = this.RP.void[room];
-		switch (voided.length) {
-			case 2:
-				text += voided[0] + ' and ' + voided[1] + ' are void';
-				break;
-			case 1:
-				text += voided[0] + ' is void. The second-last RP in this room is unknown';
-				break;
-			case 0:
-				text += 'The last 2 RPs in this room are unknown.';
-				break;
-			default:
-				return this.say(room, 'Something went wrong with how void RPs are stored');
-		}
-		var concurrent = (room === 'roleplaying') ? splitDoc(this.RP['amphyrp'].plot) : splitDoc(this.RP['roleplaying'].plot);
-		var currentRust = (this.RP['rustyrp']) ? splitDoc(this.RP['rustyrp'].plot) : '';
-		if (concurrent) text += '. The RP in ' + ((room === 'roleplaying') ? 'AmphyRP' : 'Roleplaying') + ' is ' + concurrent;
-		if (currentRust) text+= ', and the RP in RustyRP is ' + currentRust;
-		if(text.charAt(text.length - 1) !== '.') text += '.';
-
-		if (!this.canUse('setrp', room, by) || this.RP[room].voidCalled) {
-			this.say(room, '/pm ' + by + ', ' + text + " (" + room + ")");
-		} else {
-			this.say(room, '**' + text + '**');
-			this.RP[room].voidCalled = true;
-			setTimeout(function() {
-				delete this.RP[room].voidCalled;
-			}.bind(this), 60 * 1000);
-		}
-	},
+	
 	rp: function(arg, by, room) {
 		if (!(room in this.RP)) return false;
 		if (this.RP[room].called) {
@@ -881,7 +832,7 @@ exports.commands = {
 		pollON[room] = true; //There's a poll on now.
 		var now = new Date(); //Good to know what time it is now
 		console.log(new Date().toString() + " "+ room.cyan + ': '.cyan + "RP poll has been has been created by " + by + ".");
-		this.say(room, '/wall **PM Roleplaying Bot** with .nom [RP] to nominate the RP you want to be next. Remember to only PM RPs you can host. Ends at xx:' + ((((now.getMinutes()+3)%60) < 10) ? '0' + (((now.getMinutes()+3)%60).toString()) : ((now.getMinutes()+3)%60).toString()) + ':' + (((now.getSeconds() < 10)) ? '0' + now.getSeconds().toString() : now.getSeconds().toString()));
+		this.say(room, '/wall **PM SkarNet** with -nom [RP] to nominate the RP you want to be next. Remember to only PM RPs you can host. Ends at xx:' + ((((now.getMinutes()+3)%60) < 10) ? '0' + (((now.getMinutes()+3)%60).toString()) : ((now.getMinutes()+3)%60).toString()) + ':' + (((now.getSeconds() < 10)) ? '0' + now.getSeconds().toString() : now.getSeconds().toString()));
 		pollTimer[room] = setTimeout(function() {
 		    console.log(new Date().toString() + " Suggestion period has ended.");
 		    if(pollNoms.length == 1) {
@@ -972,18 +923,7 @@ exports.commands = {
         	default:
         		break;
         }
-        if(this.RP['amphyrp'].plot) {
-    	    if(toId(arg) == toId(splitDoc(this.RP['amphyrp'].plot))) {
-    	  	this.say(room, 'That RP is currently ongoing in amphyrp.');
-        		return false;
-			}
-    	}
-    	if(this.RP['rustyrp'].plot) {
-    	    if(toId(arg) == toId(splitDoc(this.RP['rustyrp'].plot))) {
-    	  	this.say(room, 'That RP is currently ongoing in rustyrp.');
-        		return false;
-			}
-    	}
+        
         if(RPOpts.indexOf(toId(arg)) == -1 && !((this.hasRank(by, '+%@#&~')) || (config.voiceList.indexOf(toId(by)) > -1) || (config.staffList.indexOf(toId(by)) > -1))) {
             this.say(room, 'Check your spelling, or if it\'s a custom, please suggest them to a voice or above.');
             return false;
@@ -1143,3 +1083,4 @@ exports.commands = {
 		}
 	}
 };
+
